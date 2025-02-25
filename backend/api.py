@@ -27,9 +27,9 @@ def generate_summary():
 def ask_question():
     data = request.get_json()
     question = data.get('question')
+    context = data.get('context')  # Retrieve context from request body
     try:
         qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
-        context = data.get('context') # changed to data.get('context')
         result = qa_pipeline(question=question, context=context)
         answer = result['answer']
         return jsonify({'answer': answer})
