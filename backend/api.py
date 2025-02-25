@@ -38,10 +38,8 @@ def ask_question():
 
 @app.route('/api/models', methods=['GET'])
 def list_models():
-    # Implement logic to list available AI models
-    models = ["model1", "model2", "model3"]  # Placeholder list
+    models = ["distilbert-base-cased-distilled-squad", "sshleifer/distilbart-cnn-12-6"]
     return jsonify({'models': models})
-
 @app.route('/api/feedback', methods=['POST'])
 def provide_feedback():
     data = request.get_json()
