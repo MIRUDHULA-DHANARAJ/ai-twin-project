@@ -14,7 +14,14 @@ def hello():
 @app.route('/api/summary', methods=['POST'])
 def generate_summary():
     data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request. JSON data is required.'}), 400
+
     text = data.get('text')
+
+    if not text:
+        return jsonify({'error': 'Missing text in request.'}), 400
+
     try:
         summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
         summary_result = summarizer(text, max_length=150, min_length=30, do_sample=False)
@@ -53,9 +60,18 @@ def list_models():
 @app.route('/api/feedback', methods=['POST'])
 def provide_feedback():
     data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request. JSON data is required.'}), 400
+
     feedback = data.get('feedback')
-    # Implement logic to store or process feedback
-    return jsonify({'message': 'Feedback received: ' + str(feedback)})
+
+    if not feedback:
+        return jsonify({'error': 'Missing feedback in request.'}), 400
+
+    try:
+        return jsonify({'message': 'Feedback received: ' + str(feedback)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
