@@ -26,8 +26,18 @@ def generate_summary():
 @app.route('/api/question', methods=['POST'])
 def ask_question():
     data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request. JSON data is required.'}), 400
+
     question = data.get('question')
-    context = data.get('context')  # Retrieve context from request body
+    context = data.get('context')
+
+    if not question:
+        return jsonify({'error': 'Missing question in request.'}), 400
+
+    if not context:
+        return jsonify({'error': 'Missing context in request.'}), 400
+
     try:
         qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
         result = qa_pipeline(question=question, context=context)
