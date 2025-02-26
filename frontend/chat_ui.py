@@ -4,8 +4,9 @@ import sys
 import os
 import pandas as pd
 
-
-sys.path.append("D:/ai-twin-student/backend")  # Replace with YOUR ACTUAL path
+# Use os.path to make the path more robust
+backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
+sys.path.append(backend_path)
 print(os.getcwd())
 import config
 
@@ -21,8 +22,20 @@ if st.button("Get Weather"):
         weather_data = response.json()
         st.write(f"Temperature: {weather_data['temperature']}°C")
         st.write(f"Description: {weather_data['description']}")
+
+        # Add weather icon
+        weather_description = weather_data['description'].lower()
+        if "clear" in weather_description:
+            st.image("https://openweathermap.org/img/wn/01d@2x.png", width=50)  # Clear sky icon
+        elif "cloud" in weather_description:
+            st.image("https://openweathermap.org/img/wn/03d@2x.png", width=50)  # Cloudy icon
+        elif "rain" in weather_description:
+            st.image("https://openweathermap.org/img/wn/10d@2x.png", width=50)  # Rain icon
+        # ... add more conditions ...
+
     except requests.exceptions.RequestException as e:
         st.error(f"Error getting weather: {e}")
+
 # Chat section
 with st.expander("Chat"):
     context = st.text_area("Enter Context:", "The Eiffel Tower is in Paris.")
@@ -31,7 +44,9 @@ with st.expander("Chat"):
     if user_input:
         st.write(f"User: {user_input}")
         try:
-            response = requests.post(f"http://{config.API_HOST}:{config.API_PORT}/chat", json={"message": user_input, "context": context})
+            # Refined Prompt Engineering
+            prompt = f"Given the following context: {context}. Answer the question: {user_input}"
+            response = requests.post(f"http://{config.API_HOST}:{config.API_PORT}/chat", json={"message": prompt, "context": context})
             response.raise_for_status()
             ai_response = response.json().get("response")
             st.write(f"AI: {ai_response}")
